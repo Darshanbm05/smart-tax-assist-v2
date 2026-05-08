@@ -13,7 +13,7 @@ services:
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     
     # Root directory (where the service code is)
-    rootDir: backend
+    rootDirectory: backend
     
     # Environment variables (set these in Render dashboard)
     # MONGODB_URL: your-mongodb-atlas-url
