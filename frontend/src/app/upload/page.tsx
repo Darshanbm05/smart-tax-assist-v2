@@ -12,6 +12,7 @@ import Link from 'next/link'
 import Image from 'next/image';
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import Sidebar from '@/components/layout/Sidebar'
+import MobileNav from '@/components/layout/MobileNav'
 
 type Status = 'idle' | 'dragging' | 'uploading' | 'success' | 'error'
 
@@ -82,11 +83,11 @@ function UploadContent() {
   }
 
   return (
-    <div className="p-8 max-w-3xl mx-auto space-y-8">
+    <div className="p-4 md:p-8 max-w-3xl mx-auto space-y-6 md:space-y-8 w-full">
       {/* Header */}
       <div className="opacity-0 animate-fade-up" style={{ animationFillMode: 'forwards' }}>
-        <h1 className="text-2xl font-bold text-white">Upload Bill</h1>
-        <p className="text-slate-400 mt-1">
+        <h1 className="text-xl md:text-2xl font-bold text-white">Upload Bill</h1>
+        <p className="text-sm md:text-base text-slate-400 mt-1">
           Bills are processed in memory only — never stored permanently.
         </p>
       </div>
@@ -114,41 +115,41 @@ function UploadContent() {
             />
 
             {file ? (
-              <div className="p-8 flex items-center gap-5">
+              <div className="p-4 md:p-8 flex flex-col md:flex-row items-center gap-3 md:gap-5">
                 {preview ? (
                   <Image
                     src={preview}
                     alt="bill preview"
                     width={96}
                     height={96}
-                    className="w-24 h-24 object-cover rounded-xl border border-surface-border"
+                    className="w-16 md:w-24 h-16 md:h-24 object-cover rounded-xl border border-surface-border shrink-0"
                   />
                 ) : (
-                  <div className="w-24 h-24 rounded-xl bg-surface border border-surface-border flex items-center justify-center">
-                    <FileText className="w-10 h-10 text-slate-500" />
+                  <div className="w-16 md:w-24 h-16 md:h-24 rounded-xl bg-surface border border-surface-border flex items-center justify-center shrink-0">
+                    <FileText className="w-8 md:w-10 h-8 md:h-10 text-slate-500" />
                   </div>
                 )}
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-white truncate">{file.name}</p>
-                  <p className="text-sm text-slate-400 mt-1">
+                <div className="flex-1 min-w-0 text-center md:text-left">
+                  <p className="font-semibold text-sm md:text-base text-white truncate">{file.name}</p>
+                  <p className="text-xs md:text-sm text-slate-400 mt-1">
                     {(file.size / 1024).toFixed(1)} KB · {file.type}
                   </p>
                 </div>
                 <button
-                  className="p-2 rounded-lg hover:bg-red-500/10 text-slate-500 hover:text-red-400 transition-colors"
+                  className="p-2 rounded-lg hover:bg-red-500/10 text-slate-500 hover:text-red-400 transition-colors shrink-0"
                   onClick={e => { e.stopPropagation(); reset() }}
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
             ) : (
-              <div className="p-12 flex flex-col items-center text-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center">
-                  <Upload className="w-8 h-8 text-brand-400" />
+              <div className="p-6 md:p-12 flex flex-col items-center text-center gap-3 md:gap-4">
+                <div className="w-12 md:w-16 h-12 md:h-16 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center">
+                  <Upload className="w-6 md:w-8 h-6 md:h-8 text-brand-400" />
                 </div>
                 <div>
-                  <p className="font-semibold text-white">Drop your bill here</p>
-                  <p className="text-sm text-slate-500 mt-1">or click to browse · JPG, PNG, PDF up to 10 MB</p>
+                  <p className="text-sm md:text-base font-semibold text-white">Drop your bill here</p>
+                  <p className="text-xs md:text-sm text-slate-500 mt-1">or click to browse · JPG, PNG, PDF up to 10 MB</p>
                 </div>
               </div>
             )}
@@ -165,17 +166,17 @@ function UploadContent() {
           {/* Actions */}
           {file && (
             <div
-              className="opacity-0 animate-fade-up flex gap-3"
+              className="opacity-0 animate-fade-up flex flex-col sm:flex-row gap-2 sm:gap-3"
               style={{ animationDelay: '120ms', animationFillMode: 'forwards' }}
             >
-              <button onClick={handleSubmit} className="btn-primary flex items-center gap-2" disabled={status === 'uploading'}>
+              <button onClick={handleSubmit} className="btn-primary flex items-center justify-center gap-2 flex-1 sm:flex-none" disabled={status === 'uploading'}>
                 {status === 'uploading' ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Extracting data…</>
                 ) : (
                   <><Upload className="w-4 h-4" /> Process Bill</>
                 )}
               </button>
-              <button onClick={reset} className="btn-ghost">Clear</button>
+              <button onClick={reset} className="btn-ghost flex-1 sm:flex-none">Clear</button>
             </div>
           )}
         </>
@@ -197,7 +198,7 @@ function UploadContent() {
               <FileText className="w-4 h-4 text-brand-400" />
               Extracted Information
             </h2>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
               {[
                 { label: 'File',     value: result.bill_name },
                 { label: 'Vendor',   value: result.vendor },
@@ -206,9 +207,9 @@ function UploadContent() {
                 { label: 'Amount',   value: fmt(result.amount) },
                 { label: 'GST',      value: fmt(result.gst) },
               ].map(({ label, value }) => (
-                <div key={label} className="bg-surface rounded-xl p-4 border border-surface-border">
+                <div key={label} className="bg-surface rounded-xl p-3 md:p-4 border border-surface-border">
                   <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">{label}</p>
-                  <p className="text-white font-semibold mt-1 truncate">{value}</p>
+                  <p className="text-sm md:text-base text-white font-semibold mt-1 truncate">{value}</p>
                 </div>
               ))}
             </div>
@@ -233,11 +234,11 @@ function UploadContent() {
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3">
-            <button onClick={reset} className="btn-primary flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <button onClick={reset} className="btn-primary flex items-center justify-center gap-2 flex-1 sm:flex-none">
               <RefreshCw className="w-4 h-4" /> Upload Another
             </button>
-            <Link href="/expenses" className="btn-ghost">
+            <Link href="/expenses" className="btn-ghost flex items-center justify-center flex-1 sm:flex-none">
               View All Expenses →
             </Link>
           </div>
@@ -250,9 +251,10 @@ function UploadContent() {
 export default function UploadPage() {
   return (
     <ProtectedRoute>
-      <div className="flex h-screen overflow-hidden bg-surface text-slate-200">
+      <div className="flex flex-col md:flex-row md:h-screen md:overflow-hidden bg-surface text-slate-200">
+        <MobileNav />
         <Sidebar />
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto md:overflow-auto">
           <UploadContent />
         </main>
       </div>

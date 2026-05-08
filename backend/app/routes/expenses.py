@@ -41,9 +41,16 @@ async def get_expenses(
     # Query and format results
     results = []
     for doc in expenses_col.find(query):
-        doc["_id"] = str(doc["_id"])  # Convert ObjectId to string
-        doc["user_id"] = str(doc["user_id"])  # Convert user_id to string too
-        results.append(doc)
+        results.append({
+            "id": str(doc["_id"]),
+            "bill_name": doc.get("bill_name", ""),
+            "vendor": doc.get("vendor", ""),
+            "category": doc.get("category", ""),
+            "expense_type": doc.get("expense_type", ""),
+            "amount": doc.get("amount", 0),
+            "gst": doc.get("gst", 0),
+            "date": doc.get("date"),
+        })
     
     return results
 
@@ -97,8 +104,16 @@ async def update_expense(
     
     # Return updated expense
     updated = expenses_col.find_one({"_id": obj_id})
-    updated["id"] = str(updated["_id"])
-    return updated
+    return {
+        "id": str(updated["_id"]),
+        "bill_name": updated.get("bill_name", ""),
+        "vendor": updated.get("vendor", ""),
+        "category": updated.get("category", ""),
+        "expense_type": updated.get("expense_type", ""),
+        "amount": updated.get("amount", 0),
+        "gst": updated.get("gst", 0),
+        "date": updated.get("date"),
+    }
 
 
 @router.delete("/expenses/{expense_id}")

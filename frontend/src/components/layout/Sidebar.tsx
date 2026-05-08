@@ -36,7 +36,7 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="w-64 shrink-0 flex flex-col bg-surface-card border-r border-surface-border h-full">
+    <aside className="hidden md:flex md:w-64 md:shrink-0 flex-col bg-surface-card border-r border-surface-border h-full">
       {/* Logo */}
       <div className="px-6 py-6 border-b border-surface-border">
         <div className="flex items-center gap-3">
@@ -95,4 +95,5 @@ export default function Sidebar() {
     </aside>
   )
 }
+
 

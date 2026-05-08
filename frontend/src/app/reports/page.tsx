@@ -10,6 +10,7 @@ import {
 import { clsx } from 'clsx'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import Sidebar from '@/components/layout/Sidebar'
+import MobileNav from '@/components/layout/MobileNav'
 
 function fmt(n: number) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n)
@@ -51,26 +52,26 @@ function ReportsContent() {
   const months = Object.entries(monthMap).sort((a, b) => b[0].localeCompare(a[0]))
 
   return (
-    <div className="p-8 max-w-5xl mx-auto space-y-8">
+    <div className="p-4 md:p-8 max-w-5xl mx-auto space-y-6 md:space-y-8 w-full">
       {/* Header */}
       <div className="opacity-0 animate-fade-up" style={{ animationFillMode: 'forwards' }}>
-        <h1 className="text-2xl font-bold text-white">Tax Reports</h1>
-        <p className="text-slate-400 mt-1">Generate and download your expense report for tax filing</p>
+        <h1 className="text-xl md:text-2xl font-bold text-white">Tax Reports</h1>
+        <p className="text-sm md:text-base text-slate-400 mt-1">Generate and download your expense report for tax filing</p>
       </div>
 
       {/* Report card */}
       <div
-        className="opacity-0 animate-fade-up card p-8 space-y-6"
+        className="opacity-0 animate-fade-up card p-4 md:p-8 space-y-4 md:space-y-6"
         style={{ animationDelay: '60ms', animationFillMode: 'forwards' }}
       >
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-              <FileSpreadsheet className="w-7 h-7 text-emerald-400" />
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+          <div className="flex items-start gap-3 md:gap-4">
+            <div className="w-10 md:w-14 h-10 md:h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+              <FileSpreadsheet className="w-5 md:w-7 h-5 md:h-7 text-emerald-400" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">SmartTax_Report.xlsx</h2>
-              <p className="text-sm text-slate-400 mt-0.5">
+              <h2 className="text-base md:text-lg font-bold text-white">SmartTax_Report.xlsx</h2>
+              <p className="text-xs md:text-sm text-slate-400 mt-0.5">
                 {summary?.expense_count ?? 0} bills · Expenses + Summary sheets
               </p>
             </div>
@@ -79,7 +80,7 @@ function ReportsContent() {
             onClick={handleDownload}
             disabled={downloading || loading || !summary?.expense_count}
             className={clsx(
-              'flex items-center gap-2 font-semibold px-6 py-3 rounded-xl transition-all duration-200 active:scale-95',
+              'flex items-center justify-center gap-2 font-semibold px-4 md:px-6 py-2 md:py-3 rounded-xl transition-all duration-200 active:scale-95 text-sm md:text-base w-full sm:w-auto',
               downloaded
                 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                 : 'btn-primary',
@@ -99,19 +100,19 @@ function ReportsContent() {
         <div className="h-px bg-surface-border" />
 
         {/* Summary stats in report card */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
           {[
             { label: 'Total Expenses', value: fmt(summary?.total_expenses ?? 0), icon: DollarSign, color: 'text-brand-400' },
             { label: 'Total GST',      value: fmt(summary?.total_gst ?? 0),      icon: TrendingUp, color: 'text-amber-400' },
             { label: 'Business',       value: fmt(summary?.business_expenses ?? 0), icon: Briefcase, color: 'text-violet-400' },
             { label: 'Personal',       value: fmt(summary?.personal_expenses ?? 0), icon: User,     color: 'text-emerald-400' },
           ].map(({ label, value, icon: Icon, color }) => (
-            <div key={label} className="bg-surface rounded-xl p-4 border border-surface-border">
+            <div key={label} className="bg-surface rounded-xl p-3 md:p-4 border border-surface-border">
               <div className="flex items-center gap-2 mb-2">
-                <Icon className={clsx('w-4 h-4', color)} />
+                <Icon className={clsx('w-3 md:w-4 h-3 md:h-4', color)} />
                 <span className="text-xs text-slate-500 font-medium">{label}</span>
               </div>
-              <p className={clsx('text-xl font-bold font-mono', loading ? 'shimmer rounded h-7' : 'text-white')}>
+              <p className={clsx('text-lg md:text-xl font-bold font-mono', loading ? 'shimmer rounded h-6 md:h-7' : 'text-white')}>
                 {loading ? '' : value}
               </p>
             </div>
@@ -120,12 +121,12 @@ function ReportsContent() {
 
         {/* Report contents breakdown */}
         <div>
-          <h3 className="text-sm font-semibold text-slate-400 mb-3">Report Columns</h3>
+          <h3 className="text-xs md:text-sm font-semibold text-slate-400 mb-2 md:mb-3">Report Columns</h3>
           <div className="flex flex-wrap gap-2">
             {['Bill Name', 'Vendor', 'Category', 'Expense Type', 'Amount ($)', 'GST ($)', 'Date'].map(col => (
               <span
                 key={col}
-                className="px-3 py-1 rounded-lg bg-brand-500/10 border border-brand-500/20 text-brand-300 text-xs font-medium font-mono"
+                className="px-2 md:px-3 py-1 rounded-lg bg-brand-500/10 border border-brand-500/20 text-brand-300 text-xs font-medium font-mono"
               >
                 {col}
               </span>
@@ -137,30 +138,30 @@ function ReportsContent() {
       {/* Monthly breakdown */}
       {months.length > 0 && (
         <div
-          className="opacity-0 animate-fade-up card p-6 space-y-4"
+          className="opacity-0 animate-fade-up card p-4 md:p-6 space-y-3 md:space-y-4"
           style={{ animationDelay: '180ms', animationFillMode: 'forwards' }}
         >
           <div className="flex items-center gap-2">
-            <Receipt className="w-5 h-5 text-brand-400" />
-            <h2 className="font-semibold text-white">Monthly Summary</h2>
+            <Receipt className="w-4 md:w-5 h-4 md:h-5 text-brand-400" />
+            <h2 className="text-sm md:text-base font-semibold text-white">Monthly Summary</h2>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-xs md:text-sm">
               <thead>
                 <tr className="border-b border-surface-border">
-                  <th className="text-left py-2.5 text-xs font-semibold text-slate-400 uppercase tracking-wide">Month</th>
-                  <th className="text-center py-2.5 text-xs font-semibold text-slate-400 uppercase tracking-wide">Bills</th>
-                  <th className="text-right py-2.5 text-xs font-semibold text-slate-400 uppercase tracking-wide">Amount</th>
-                  <th className="text-right py-2.5 text-xs font-semibold text-slate-400 uppercase tracking-wide">GST</th>
+                  <th className="text-left py-2 md:py-2.5 px-2 md:px-0 text-xs font-semibold text-slate-400 uppercase tracking-wide">Month</th>
+                  <th className="text-center py-2 md:py-2.5 px-2 md:px-0 text-xs font-semibold text-slate-400 uppercase tracking-wide">Bills</th>
+                  <th className="text-right py-2 md:py-2.5 px-2 md:px-0 text-xs font-semibold text-slate-400 uppercase tracking-wide">Amount</th>
+                  <th className="text-right py-2 md:py-2.5 px-2 md:px-0 text-xs font-semibold text-slate-400 uppercase tracking-wide">GST</th>
                 </tr>
               </thead>
               <tbody>
                 {months.map(([month, data]) => (
                   <tr key={month} className="border-b border-surface-border last:border-0 hover:bg-white/[0.02]">
-                    <td className="py-3 text-slate-300 font-medium">{month}</td>
-                    <td className="py-3 text-center text-slate-400">{data.count}</td>
-                    <td className="py-3 text-right font-mono text-white">{fmt(data.amount)}</td>
-                    <td className="py-3 text-right font-mono text-amber-400">{fmt(data.gst)}</td>
+                    <td className="py-2 md:py-3 px-2 md:px-0 text-slate-300 font-medium text-xs md:text-sm">{month}</td>
+                    <td className="py-2 md:py-3 px-2 md:px-0 text-center text-slate-400 text-xs md:text-sm">{data.count}</td>
+                    <td className="py-2 md:py-3 px-2 md:px-0 text-right font-mono text-white text-xs md:text-sm">{fmt(data.amount)}</td>
+                    <td className="py-2 md:py-3 px-2 md:px-0 text-right font-mono text-amber-400 text-xs md:text-sm">{fmt(data.gst)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -172,12 +173,12 @@ function ReportsContent() {
       {/* No data notice */}
       {!loading && expenses.length === 0 && (
         <div
-          className="opacity-0 animate-fade-up card p-12 text-center"
+          className="opacity-0 animate-fade-up card p-8 md:p-12 text-center"
           style={{ animationDelay: '120ms', animationFillMode: 'forwards' }}
         >
-          <FileSpreadsheet className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-          <p className="text-slate-400 font-medium">No expenses to report yet</p>
-          <p className="text-sm text-slate-500 mt-1">Upload some bills first, then generate your report.</p>
+          <FileSpreadsheet className="w-10 md:w-12 h-10 md:h-12 text-slate-600 mx-auto mb-3 md:mb-4" />
+          <p className="text-sm md:text-base text-slate-400 font-medium">No expenses to report yet</p>
+          <p className="text-xs md:text-sm text-slate-500 mt-1">Upload some bills first, then generate your report.</p>
         </div>
       )}
     </div>
@@ -187,9 +188,10 @@ function ReportsContent() {
 export default function ReportsPage() {
   return (
     <ProtectedRoute>
-      <div className="flex h-screen overflow-hidden bg-surface text-slate-200">
+      <div className="flex flex-col md:flex-row md:h-screen md:overflow-hidden bg-surface text-slate-200">
+        <MobileNav />
         <Sidebar />
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto md:overflow-auto">
           <ReportsContent />
         </main>
       </div>
