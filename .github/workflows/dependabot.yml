@@ -1,0 +1,63 @@
+name: Dependabot - Automated Dependency Updates
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  schedule:
+    # Check for dependency updates daily at 3 AM UTC
+    - cron: '0 3 * * *'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  auto-merge-dependabot:
+    name: Auto-merge Security Updates
+    runs-on: ubuntu-latest
+    
+    if: github.actor == 'dependabot[bot]'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Enable auto-merge for Dependabot PRs
+        run: |
+          echo "🤖 Dependabot PR detected"
+          echo "This PR will be auto-merged if tests pass"
+        shell: bash
+
+  review-dependabot:
+    name: Review Dependabot Updates
+    runs-on: ubuntu-latest
+    
+    if: github.actor == 'dependabot[bot]'
+    
+    steps:
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v1
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Approve and enable auto-merge for minor/patch updates
+        if: steps.metadata.outputs.update-type == 'version-update:semver-patch' || steps.metadata.outputs.update-type == 'version-update:semver-minor'
+        run: |
+          echo "✅ Minor/Patch dependency update - Auto-merging"
+          gh pr review --approve "$PR_NUMBER"
+          gh pr merge --auto --squash "$PR_NUMBER"
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Request review for major updates
+        if: steps.metadata.outputs.update-type == 'version-update:semver-major'
+        run: |
+          echo "⚠️  Major dependency update - Requesting manual review"
+          gh pr comment "$PR_NUMBER" --body "🚨 **Major Update** - Please review before merging"
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true

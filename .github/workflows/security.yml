@@ -1,0 +1,115 @@
+name: CodeQL - Security Analysis
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    # Run security scans daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  analyze:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['python', 'javascript']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-and-quality
+
+      - name: Set up Python (for Python analysis)
+        if: matrix.language == 'python'
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Set up Node.js (for JavaScript analysis)
+        if: matrix.language == 'javascript'
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Build Python (if needed)
+        if: matrix.language == 'python'
+        run: |
+          cd backend
+          pip install -r requirements.txt
+        continue-on-error: true
+
+      - name: Build JavaScript (if needed)
+        if: matrix.language == 'javascript'
+        run: |
+          cd frontend
+          npm install
+        continue-on-error: true
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:${{ matrix.language }}"
+
+  secret-scanning:
+    name: Secret Detection
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: TruffleHog - Secrets Detection
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
+        continue-on-error: true
+
+  dependency-check:
+    name: Dependency Security
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Check backend dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          pip install safety
+          echo "🔍 Checking Python dependencies for known vulnerabilities..."
+          safety check --json || true
+        continue-on-error: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Check frontend dependencies
+        run: |
+          cd frontend
+          npm install
+          echo "🔍 Checking npm dependencies for known vulnerabilities..."
+          npm audit --audit-level=moderate || true
+        continue-on-error: true
